@@ -33,11 +33,23 @@ class MainActivity : AppCompatActivity() {
         myCompositeDisposable?.add(apiService.getCurrencyData("EUR")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe(this::handleResponse))
+            .subscribe(this::onNext, this::onError, this::onComplete, this::onSubscribe))
     }
 
-    private fun handleResponse(response: ApiResponse) {
+    private fun onNext(response: ApiResponse) {
+        Log.v("handleResponse", response.base)
+    }
 
+    private fun onError(e: Throwable) {
+        Log.v("handleResponse", e.message)
+    }
+
+    private fun onSubscribe(d: Disposable) {
+        Log.v("handleResponse", "" + d.isDisposed)
+    }
+
+    private fun onComplete() {
+        Log.v("handleResponse", "onComplete")
     }
 
 
