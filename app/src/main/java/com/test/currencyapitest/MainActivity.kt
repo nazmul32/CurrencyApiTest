@@ -1,5 +1,4 @@
 package com.test.currencyapitest
-import ApiResponse
 import android.annotation.TargetApi
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,75 +11,90 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.Disposable
 import com.test.currencyapitest.network.RetrofitClient
-import io.reactivex.Observer
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Locale
+import android.app.ActivityGroup
+import io.reactivex.observers.DisposableObserver
+import javax.xml.datatype.DatatypeConstants.SECONDS
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import ApiResponse
+import android.graphics.drawable.PictureDrawable
+import android.net.Uri
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.test.currencyapitest.network.CountryFlag
+import io.reactivex.*
+import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
+import io.reactivex.functions.Predicate
+import io.reactivex.processors.PublishProcessor
+import io.reactivex.schedulers.Schedulers.from
+import java.lang.System.err
+import java.util.concurrent.TimeUnit
+import io.reactivex.schedulers.Schedulers.from
+import kotlinx.android.synthetic.main.activity_main.*
+import org.reactivestreams.Subscriber
+import retrofit2.Response
+import java.io.InputStream
+import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity() {
-
-    private var myCompositeDisposable: CompositeDisposable? = null
+    private lateinit var disposable: Disposable
+    private lateinit var currencyAdapter: CurrencyAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initRecyclerView()
         sendCurrencyDataRequest()
     }
 
     private fun sendCurrencyDataRequest() {
         val retrofitClient = RetrofitClient.getRetrofitClient()
         val apiService = retrofitClient.create(APIService::class.java)
-        myCompositeDisposable?.add(apiService.getCurrencyData("EUR")
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(this::onNext, this::onError, this::onComplete, this::onSubscribe))
+        val scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
+        disposable =
+            Observable.interval(0, 1, TimeUnit.SECONDS, scheduler)
+                .flatMapSingle { t -> apiService.getCurrencyData("EUR") }
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry()
+                .distinct()
+                .subscribe({ result -> onSuccess(result) }, { error -> onError(error) })
     }
 
-    private fun onNext(response: ApiResponse) {
-        Log.v("handleResponse", response.base)
+    override fun onStop() {
+        super.onStop()
+        disposable.dispose()
     }
 
-    private fun onError(e: Throwable) {
-        Log.v("handleResponse", e.message)
+    private fun onSuccess(response: Response<ApiResponse>) {
+        val keyList = response.body()?.rates?.keys?.toMutableList()
+        val valueList = response.body()?.rates?.values?.toMutableList()
+        saveCountryFlagImageUrl(keyList)
+        currencyAdapter.updateAdapter(keyList, valueList)
     }
 
-    private fun onSubscribe(d: Disposable) {
-        Log.v("handleResponse", "" + d.isDisposed)
+    private fun onError(e: Throwable?) {
+        Log.v("handleResponse", "onError: {${e?.message}}")
     }
 
-    private fun onComplete() {
-        Log.v("handleResponse", "onComplete")
-    }
-
-
-    private fun printCountryIso() {
-        val response = "{\"base\":\"EUR\",\"date\":\"2018-09-06\"," +
-                "\"rates\":{\"AUD\":1.6087,\"BGN\":1.9465,\"BRL\":4.7689," +
-                "\"CAD\":1.5265,\"CHF\":1.1221,\"CNY\":7.9072,\"CZK\":25.592," +
-                "\"DKK\":7.4211,\"GBP\":0.89395,\"HKD\":9.0888,\"HRK\":7.3986," +
-                "\"HUF\":324.93,\"IDR\":17241.0,\"ILS\":4.1507,\"INR\":83.318," +
-                "\"ISK\":127.19,\"JPY\":128.93,\"KRW\":1298.5,\"MXN\":22.259," +
-                "\"MYR\":4.789,\"NOK\":9.7293,\"NZD\":1.7549,\"PHP\":62.293," +
-                "\"PLN\":4.2977,\"RON\":4.6164,\"RUB\":79.195,\"SEK\":10.54," +
-                "\"SGD\":1.5924,\"THB\":37.948,\"TRY\":7.5918,\"USD\":1.1578,\"ZAR\":17.738}}"
-
-        val jsonObject = JSONObject(response).getJSONObject("rates")
-        jsonObject.keys().forEach { s -> printIso(s) }
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private fun printIso(currencyCode: String) {
-        Log.v("printCountryIso", "https://restcountries.eu/data/" +  getLocale(currencyCode)?.isO3Country?.toLowerCase() + ".svg")
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private fun getLocale(strCode: String): Locale? {
-        for (locale in NumberFormat.getAvailableLocales()) {
-            val code = NumberFormat.getCurrencyInstance(locale).currency?.currencyCode
-            if (strCode == code) {
-                return locale
-            }
+    private fun saveCountryFlagImageUrl(keyList: MutableList<String>?) {
+        keyList?.forEach {
+            CountryFlag.updateFlagImageUrl(it)
         }
-        return null
+    }
+
+    private fun initRecyclerView() {
+        val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
+        recycler_view.layoutManager = layoutManager
+        currencyAdapter = CurrencyAdapter(Glide.with(this))
+        recycler_view.adapter = currencyAdapter
+        recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 }

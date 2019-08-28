@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:clickable="true"
+    android:background="@drawable/list_item_selector"
+    android:focusable="true"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1" >
+
+        <ImageView
+            android:scaleType="centerInside"
+            android:id="@+id/iv_flag"
+            android:layout_width="45dp"
+            android:layout_height="45dp" />
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/tv_name"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@color/app_black"
+            android:textSize="@dimen/text_size_medium"
+            android:gravity="start|center_vertical" />
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/tv_currency"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textColor="@color/app_black"
+            android:textSize="@dimen/text_size_medium"
+            android:gravity="center_vertical|end" />
+</LinearLayout>
