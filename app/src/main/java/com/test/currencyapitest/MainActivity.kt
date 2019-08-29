@@ -59,18 +59,11 @@ class MainActivity : AppCompatActivity() {
         Log.v("handleResponse", "onSuccess")
         val keyList = response.body()?.rates?.keys?.toMutableList()
         val valueList = response.body()?.rates?.values?.toMutableList()
-        saveCountryFlagImageUrl(keyList)
         currencyAdapter?.updateAdapter(keyList, valueList)
     }
 
     private fun onError(e: Throwable?) {
         Log.v("handleResponse", "onError: {${e?.message}}")
-    }
-
-    private fun saveCountryFlagImageUrl(keyList: MutableList<String>?) {
-        keyList?.forEach {
-            CountryFlag.updateFlagImageUrl(it)
-        }
     }
 
     private fun initRecyclerView() {

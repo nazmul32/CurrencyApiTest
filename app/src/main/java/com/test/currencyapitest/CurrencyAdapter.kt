@@ -12,6 +12,7 @@ import com.test.currencyapitest.network.CountryFlag
 import com.bumptech.glide.request.RequestOptions
 import android.graphics.drawable.PictureDrawable
 import android.R.transition
+import android.util.Log
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.resource.bitmap.TransformationUtils.fitCenter
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
@@ -37,7 +38,8 @@ class CurrencyAdapter(val glide: RequestManager) : RecyclerView.Adapter<Currency
             with(itemView) {
                 tv_name.text = key?.get(position) ?: ""
                 tv_currency.text =  value?.get(position)?.toString() ?: ""
-                loadImage(CountryFlag.getFlagImageUrl(key?.get(position) ?: ""),
+
+                loadImage(CountryFlag.getFlagImageDrawable(key?.get(position)?.substring(0, 2)?.toLowerCase() ?: ""),
                     iv_flag)
             }
         }
@@ -49,13 +51,11 @@ class CurrencyAdapter(val glide: RequestManager) : RecyclerView.Adapter<Currency
         notifyDataSetChanged()
     }
 
-    fun loadImage(url: String?, view: ImageView) {
-
-        glide.load(R.drawable.ic_us).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
-
-//        glide.load(url).apply(RequestOptions()
-//            .centerCrop()
-//            .format(DecodeFormat.PREFER_ARGB_8888)
-//            .override(com.bumptech.glide.request.target.Target.SIZE_ORIGINAL)).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
+    fun loadImage(resId: Int?, view: ImageView) {
+        if (resId == null) {
+            return
+        }
+        glide.load(resId).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
+        Log.v("loadImage", "Loading " + view.context.resources.getResourceEntryName(resId))
     }
 }
