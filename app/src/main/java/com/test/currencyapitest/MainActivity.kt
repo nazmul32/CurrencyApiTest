@@ -1,58 +1,35 @@
 package com.test.currencyapitest
-import android.annotation.TargetApi
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import org.json.JSONObject
-import android.os.Build
-import android.icu.text.NumberFormat
 import com.test.currencyapitest.network.APIService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.Disposable
 import com.test.currencyapitest.network.RetrofitClient
-import io.reactivex.disposables.CompositeDisposable
-import java.util.Locale
-import android.app.ActivityGroup
-import io.reactivex.observers.DisposableObserver
-import javax.xml.datatype.DatatypeConstants.SECONDS
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import ApiResponse
 import android.graphics.drawable.PictureDrawable
-import android.net.Uri
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.test.currencyapitest.network.CountryFlag
 import io.reactivex.*
-import io.reactivex.functions.Consumer
-import io.reactivex.functions.Function
-import io.reactivex.functions.Predicate
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.schedulers.Schedulers.from
-import java.lang.System.err
 import java.util.concurrent.TimeUnit
-import io.reactivex.schedulers.Schedulers.from
 import kotlinx.android.synthetic.main.activity_main.*
-import org.reactivestreams.Subscriber
 import retrofit2.Response
-import java.io.InputStream
 import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var disposable: Disposable
-    private lateinit var currencyAdapter: CurrencyAdapter
+    private var disposable: Disposable? = null
+    private var currencyAdapter: CurrencyAdapter?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         initRecyclerView()
-        sendCurrencyDataRequest()
     }
 
     private fun sendCurrencyDataRequest() {
@@ -68,16 +45,22 @@ class MainActivity : AppCompatActivity() {
                 .subscribe({ result -> onSuccess(result) }, { error -> onError(error) })
     }
 
+    override fun onStart() {
+        super.onStart()
+        sendCurrencyDataRequest()
+    }
+
     override fun onStop() {
         super.onStop()
-        disposable.dispose()
+        disposable?.dispose()
     }
 
     private fun onSuccess(response: Response<ApiResponse>) {
+        Log.v("handleResponse", "onSuccess")
         val keyList = response.body()?.rates?.keys?.toMutableList()
         val valueList = response.body()?.rates?.values?.toMutableList()
         saveCountryFlagImageUrl(keyList)
-        currencyAdapter.updateAdapter(keyList, valueList)
+        currencyAdapter?.updateAdapter(keyList, valueList)
     }
 
     private fun onError(e: Throwable?) {

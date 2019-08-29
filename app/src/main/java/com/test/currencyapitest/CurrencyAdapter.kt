@@ -12,6 +12,7 @@ import com.test.currencyapitest.network.CountryFlag
 import com.bumptech.glide.request.RequestOptions
 import android.graphics.drawable.PictureDrawable
 import android.R.transition
+import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.resource.bitmap.TransformationUtils.fitCenter
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 
@@ -49,13 +50,12 @@ class CurrencyAdapter(val glide: RequestManager) : RecyclerView.Adapter<Currency
     }
 
     fun loadImage(url: String?, view: ImageView) {
-        glide.load(url).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
 
-//        glide.`as`(PictureDrawable::class.java)
-//            .transition(withCrossFade())
-//            .centerInside()
-//            .listener(SvgSoftwareLayerSetter())
-//            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
-//            .load(uri).into(imageView)
+        glide.load(R.drawable.ic_us).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
+
+//        glide.load(url).apply(RequestOptions()
+//            .centerCrop()
+//            .format(DecodeFormat.PREFER_ARGB_8888)
+//            .override(com.bumptech.glide.request.target.Target.SIZE_ORIGINAL)).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
     }
 }

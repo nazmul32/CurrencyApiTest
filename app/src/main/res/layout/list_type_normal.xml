@@ -16,8 +16,8 @@
         android:layout_weight="1" >
 
         <ImageView
-            android:scaleType="centerInside"
             android:id="@+id/iv_flag"
+            android:adjustViewBounds="true"
             android:layout_width="45dp"
             android:layout_height="45dp" />
 

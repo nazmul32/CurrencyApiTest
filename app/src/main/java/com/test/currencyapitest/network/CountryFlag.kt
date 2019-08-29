@@ -17,10 +17,9 @@ class CountryFlag private constructor() {
 
         fun updateFlagImageUrl(currencyCode: String) {
             if (!countryFlagMap.containsKey(currencyCode)) {
-                val url = "https://restcountries.eu/data/" +
-                        getLocale(currencyCode)?.isO3Country?.toLowerCase() + ".svg"
+                val url = "https://www.countryflags.io/${currencyCode.toLowerCase().substring(0, 2)}/flat/64.png"
                 countryFlagMap[currencyCode] = url
-                Log.v("countryFlagMap", url)
+                Log.v("countryFlagMap", currencyCode.toLowerCase().substring(0, 2))
             }
         }
 
