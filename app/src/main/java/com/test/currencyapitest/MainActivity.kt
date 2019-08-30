@@ -9,6 +9,7 @@ import io.reactivex.disposables.Disposable
 import com.test.currencyapitest.network.RetrofitClient
 import ApiResponse
 import android.graphics.drawable.PictureDrawable
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,8 +59,10 @@ class MainActivity : AppCompatActivity() {
     private fun onSuccess(response: Response<ApiResponse>) {
         Log.v("handleResponse", "onSuccess")
         val keyList = response.body()?.rates?.keys?.toMutableList()
+        keyList?.forEach { t: String? -> Log.v("keyList", t) }
         val valueList = response.body()?.rates?.values?.toMutableList()
         currencyAdapter?.updateAdapter(keyList, valueList)
+//        runLayoutAnimation(recycler_view)
     }
 
     private fun onError(e: Throwable?) {
@@ -72,5 +75,16 @@ class MainActivity : AppCompatActivity() {
         currencyAdapter = CurrencyAdapter(Glide.with(this))
         recycler_view.adapter = currencyAdapter
         recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+    }
+
+    private fun runLayoutAnimation(recyclerView: RecyclerView) {
+        if (recyclerView.adapter != null) {
+            val controller =
+                AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down)
+
+            recyclerView.layoutAnimation = controller
+            recyclerView.adapter!!.notifyDataSetChanged()
+            recyclerView.scheduleLayoutAnimation()
+        }
     }
 }

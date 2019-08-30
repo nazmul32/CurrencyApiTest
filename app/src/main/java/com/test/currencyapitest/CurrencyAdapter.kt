@@ -39,7 +39,7 @@ class CurrencyAdapter(val glide: RequestManager) : RecyclerView.Adapter<Currency
                 tv_name.text = key?.get(position) ?: ""
                 tv_currency.text =  value?.get(position)?.toString() ?: ""
 
-                loadImage(CountryFlag.getFlagImageDrawable(key?.get(position)?.substring(0, 2)?.toLowerCase() ?: ""),
+                showFlagImage(CountryFlag.getFlagImageDrawable(key?.get(position) ?: ""),
                     iv_flag)
             }
         }
@@ -51,11 +51,11 @@ class CurrencyAdapter(val glide: RequestManager) : RecyclerView.Adapter<Currency
         notifyDataSetChanged()
     }
 
-    fun loadImage(resId: Int?, view: ImageView) {
+    fun showFlagImage(resId: Int?, view: ImageView) {
         if (resId == null) {
-            return
+            glide.load(R.drawable.ic_flag_none).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
+        } else {
+            glide.load(resId).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
         }
-        glide.load(resId).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(view)
-        Log.v("loadImage", "Loading " + view.context.resources.getResourceEntryName(resId))
     }
 }
