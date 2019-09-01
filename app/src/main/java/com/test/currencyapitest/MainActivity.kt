@@ -8,14 +8,12 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.Disposable
 import com.test.currencyapitest.network.RetrofitClient
 import ApiResponse
-import android.graphics.drawable.PictureDrawable
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.test.currencyapitest.network.CountryFlag
-import io.reactivex.*
+import io.reactivex.Observable
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Response
@@ -62,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         keyList?.forEach { t: String? -> Log.v("keyList", t) }
         val valueList = response.body()?.rates?.values?.toMutableList()
         currencyAdapter?.updateAdapter(keyList, valueList)
-//        runLayoutAnimation(recycler_view)
     }
 
     private fun onError(e: Throwable?) {
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         recycler_view.layoutManager = layoutManager
-        currencyAdapter = CurrencyAdapter(Glide.with(this))
+        currencyAdapter = CurrencyAdapter(Glide.with(this), itemClickListener)
         recycler_view.adapter = currencyAdapter
         recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
@@ -85,6 +82,23 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutAnimation = controller
             recyclerView.adapter!!.notifyDataSetChanged()
             recyclerView.scheduleLayoutAnimation()
+        }
+    }
+
+    private val itemClickListener = object : CurrencyAdapter.OnItemClickListener {
+        override fun onItemClick(position: Int, keys: MutableList<String>?, values: MutableList<Double>?) {
+            disposable?.dispose()
+            val key = keys?.get(position)
+            val value = values?.get(position)
+            keys?.removeAt(position)
+            keys?.add(0, key ?: "")
+            values?.removeAt(position)
+            values?.add(0, value ?: 0.0)
+
+            currencyAdapter?.updateAdapterOnClick(keys, values, position, 0)
+            recycler_view.scrollToPosition(0)
+            Log.v("hi", "hi")
+            recycler_view.requestFocus()
         }
     }
 }
