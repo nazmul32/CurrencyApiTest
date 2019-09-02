@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#E5E5E5</color>
     <color name="colorAccent">#D81B60</color>
 
     <color name="app_black">#191C1F</color>
     <color name="app_grey">#8B959E</color>
     <color name="search_box_background_color">#BB000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     <color name="transparent_black">#80000000</color>
     <color name="transparent_black_lighter">#10000000</color>

@@ -1,7 +1,6 @@
 package com.test.currencyapitest.network
 
-import ApiResponse
-import io.reactivex.Observable
+import com.test.currencyapitest.model.ApiResponse
 import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.http.GET
