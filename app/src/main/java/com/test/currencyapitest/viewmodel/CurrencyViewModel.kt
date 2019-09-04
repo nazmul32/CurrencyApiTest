@@ -11,10 +11,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.ViewModel
 import java.math.RoundingMode
+import javax.inject.Inject
 
 
-class CurrencyViewModel(application: Application) : AndroidViewModel(application) {
+class CurrencyViewModel @Inject constructor() : ViewModel() {
     private val currenciesLiveData: MutableLiveData<ArrayList<CurrencyDatum>> = MutableLiveData()
     private val currenciesLiveDataUpdateRates: MutableLiveData<ArrayList<CurrencyDatum>> =
         MutableLiveData()

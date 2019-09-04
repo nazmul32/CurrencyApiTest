@@ -1,4 +1,4 @@
-package com.test.currencyapitest.view
+package com.test.currencyapitest.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,13 +23,21 @@ import com.test.currencyapitest.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.fragment_currency.*
 import kotlinx.android.synthetic.main.fragment_currency.view.*
 import retrofit2.Response
+import javax.inject.Inject
 
-class CurrencyFragment : Fragment() {
-    private lateinit var currencyAdapter: CurrencyAdapter
-    private lateinit var currencyRequestHandler: CurrencyRequestHandler
-    private lateinit var currencyViewModel: CurrencyViewModel
+class CurrencyFragment @Inject constructor() : Fragment() {
+    lateinit var currencyRequestHandler: CurrencyRequestHandler
 
-    private lateinit var binding: FragmentCurrencyBinding
+    @Inject
+    lateinit var currencyViewModel: CurrencyViewModel
+
+    lateinit var binding: FragmentCurrencyBinding
+
+    @Inject
+    lateinit var currencyAdapter: CurrencyAdapter
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,37 +54,20 @@ class CurrencyFragment : Fragment() {
     }
 
     private fun subscribeLiveDataObservers() {
-        currencyViewModel.getCurrenciesLiveData().observe(this, androidx.lifecycle.Observer { t -> currencyAdapter.updateAdapter(t) })
-        currencyViewModel.getCurrenciesLiveDataForUpdateRates().observe(this, androidx.lifecycle.Observer { t -> currencyAdapter.updateAdapterForRates(t) })
-        currencyViewModel.visibilityProgressBar.observe(this, androidx.lifecycle.Observer { t -> progress_bar_container.visibility = t })
-        currencyViewModel.visibilityRecyclerView.observe(this, androidx.lifecycle.Observer { t -> recycler_view.visibility = t })
+        ViewModelProviders.of(this, viewModelFactory)[CurrencyViewModel::class.java].getCurrenciesLiveData().observe(this, androidx.lifecycle.Observer { t -> currencyAdapter.updateAdapter(t) })
+        ViewModelProviders.of(this, viewModelFactory)[CurrencyViewModel::class.java].getCurrenciesLiveDataForUpdateRates().observe(this, androidx.lifecycle.Observer { t -> currencyAdapter.updateAdapterForRates(t) })
+        ViewModelProviders.of(this, viewModelFactory)[CurrencyViewModel::class.java].visibilityProgressBar.observe(this, androidx.lifecycle.Observer { t -> progress_bar_container.visibility = t })
+        ViewModelProviders.of(this, viewModelFactory)[CurrencyViewModel::class.java].visibilityRecyclerView.observe(this, androidx.lifecycle.Observer { t -> recycler_view.visibility = t })
     }
 
     private fun initRecyclerView() {
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(activity)
         binding.root.recycler_view.layoutManager = layoutManager
-        currencyAdapter = CurrencyAdapter(
-            itemClickListener,
-            null
-        )
         binding.root.recycler_view.setHasFixedSize(true)
         binding.root.recycler_view.adapter = currencyAdapter
         binding.root.recycler_view.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
     }
 
-    private val itemClickListener = object : CurrencyAdapter.OnItemClickListener {
-        override fun onItemClick() {
-            binding.root.recycler_view.scrollToPosition(0)
-        }
-
-        override fun onAmountEntered(
-            currencyCode: String?,
-            amount: String
-        ) {
-            Log.v("onAmountEntered", "$currencyCode $amount")
-            currencyViewModel.updateMutableLiveData(currencyCode, amount)
-        }
-    }
 
     private val listener = object : CurrencyRequestHandler.OnResponseReceivedListener {
         override fun onResponseReceived(response: Response<ApiResponse>) {

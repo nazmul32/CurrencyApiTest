@@ -1,8 +1,8 @@
 package com.test.currencyapitest.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import javax.inject.Inject
 
-class RecyclerViewModel(application: Application) : AndroidViewModel(application) {
+class RecyclerViewModel @Inject constructor(): ViewModel() {
 
 }

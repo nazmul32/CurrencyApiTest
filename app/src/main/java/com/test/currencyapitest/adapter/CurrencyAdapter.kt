@@ -5,24 +5,24 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import androidx.databinding.ViewDataBinding
 import com.test.currencyapitest.databinding.ListTypeCurrencyEmptyBinding
 import com.test.currencyapitest.databinding.ListTypeCurrencyNormalBinding
+import com.test.currencyapitest.interfaces.OnItemAmountUpdateListener
+import com.test.currencyapitest.interfaces.OnItemClickListener
 import com.test.currencyapitest.model.CurrencyDatum
 import com.test.currencyapitest.network.Constants
 import kotlinx.android.synthetic.main.list_type_currency_normal.view.*
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 
 
-class CurrencyAdapter(
-    private val listener: OnItemClickListener,
+class CurrencyAdapter @Inject constructor(
+    private val itemClickListener: OnItemClickListener,
+    private val itemAmountUpdateListener: OnItemAmountUpdateListener,
     private var currencyDatumList: ArrayList<CurrencyDatum>?
 ) : RecyclerView.Adapter<CurrencyAdapter.BaseViewHolder<*>>() {
 
@@ -49,7 +49,7 @@ class CurrencyAdapter(
                     if (currLen < prevLen) {
                         if (str != previousAmount && viewHolder.adapterPosition == 0) {
                             previousAmount = str
-                            listener.onAmountEntered(
+                            itemAmountUpdateListener.onAmountEntered(
                                 currencyDatumList?.get(viewHolder.adapterPosition)?.currencyCode,
                                 str
                             )
@@ -57,7 +57,7 @@ class CurrencyAdapter(
                     } else {
                         if (str.isNotEmpty() && str != previousAmount && viewHolder.adapterPosition == 0) {
                             previousAmount = str
-                            listener.onAmountEntered(
+                            itemAmountUpdateListener.onAmountEntered(
                                 currencyDatumList?.get(viewHolder.adapterPosition)?.currencyCode,
                                 str
                             )
@@ -111,8 +111,10 @@ class CurrencyAdapter(
     }
 
     fun updateAdapterForRates(currencyDatumList: ArrayList<CurrencyDatum>) {
-        this.currencyDatumList = currencyDatumList
-        notifyItemRangeChanged(1, itemCount - 1)
+        if (itemCount > 1) {
+            this.currencyDatumList = currencyDatumList
+            notifyItemRangeChanged(1, itemCount - 1)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -121,14 +123,6 @@ class CurrencyAdapter(
         } else {
             Constants.NORMAL_VIEW_TYPE
         }
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick()
-        fun onAmountEntered(
-            currencyCode: String?,
-            amount: String
-        )
     }
 
     abstract class BaseViewHolder<T>(applicationBinding: ViewDataBinding) :
@@ -142,7 +136,7 @@ class CurrencyAdapter(
         applicationBinding.etCurrency.requestFocus()
         Collections.swap(currencyDatumList, 0, position)
         notifyItemMoved(position, 0)
-        listener.onItemClick()
+        itemClickListener.onItemClick()
         askingFocusExternally = false
     }
 

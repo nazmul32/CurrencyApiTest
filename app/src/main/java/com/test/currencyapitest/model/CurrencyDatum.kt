@@ -16,7 +16,6 @@ class CurrencyDatum : BaseObservable() {
     var flagImageId: Int? = null
     var currencyAmount: String? = null
 
-    @BindingAdapter("android:src")
     fun setImageSrc(view: ImageView) {
         Glide.with(view.context).load(flagImageId).error(R.drawable.ic_flag_none).apply(RequestOptions.circleCropTransform()).diskCacheStrategy(
             DiskCacheStrategy.AUTOMATIC).into(view)
