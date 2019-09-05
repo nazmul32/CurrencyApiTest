@@ -1,4 +1,4 @@
-package com.test.currencyapitest.di
+package com.test.currencyapitest.dagger
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

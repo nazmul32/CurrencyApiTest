@@ -3,7 +3,7 @@ package com.test.currencyapitest.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.test.currencyapitest.R
-import com.test.currencyapitest.di.DaggerMainActivityComponent
+import com.test.currencyapitest.dagger.DaggerAppComponent
 import javax.inject.Inject
 
 
@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        DaggerMainActivityComponent.create().inject(this)
+        DaggerAppComponent.builder().build().inject(this)
         supportActionBar?.elevation = 2f
         supportActionBar?.title = getString(R.string.rates)
         addCurrencyFragment()
