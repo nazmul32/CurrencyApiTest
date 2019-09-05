@@ -12,7 +12,7 @@ import com.test.currencyapitest.databinding.ListTypeCurrencyNormalBinding
 import com.test.currencyapitest.interfaces.OnItemAmountUpdateListener
 import com.test.currencyapitest.interfaces.OnItemClickListener
 import com.test.currencyapitest.model.CurrencyDatum
-import com.test.currencyapitest.network.Constants
+import com.test.currencyapitest.util.Constants
 import kotlinx.android.synthetic.main.list_type_currency_normal.view.*
 import java.util.*
 import javax.inject.Inject
@@ -21,8 +21,8 @@ import kotlin.collections.ArrayList
 
 
 class CurrencyAdapter @Inject constructor(
-    private val itemClickListener: OnItemClickListener,
-    private val itemAmountUpdateListener: OnItemAmountUpdateListener,
+    private val onItemClickListener: OnItemClickListener,
+    private val onItemAmountUpdateListener: OnItemAmountUpdateListener,
     private var currencyDatumList: ArrayList<CurrencyDatum>?
 ) : RecyclerView.Adapter<CurrencyAdapter.BaseViewHolder<*>>() {
 
@@ -30,6 +30,7 @@ class CurrencyAdapter @Inject constructor(
     private var previousAmount:String? = null
     private var prevLen = 0
     private var currLen = 0
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         val inflater = LayoutInflater.from(parent.context)
@@ -49,7 +50,7 @@ class CurrencyAdapter @Inject constructor(
                     if (currLen < prevLen) {
                         if (str != previousAmount && viewHolder.adapterPosition == 0) {
                             previousAmount = str
-                            itemAmountUpdateListener.onAmountEntered(
+                            onItemAmountUpdateListener.onAmountEntered(
                                 currencyDatumList?.get(viewHolder.adapterPosition)?.currencyCode,
                                 str
                             )
@@ -57,7 +58,7 @@ class CurrencyAdapter @Inject constructor(
                     } else {
                         if (str.isNotEmpty() && str != previousAmount && viewHolder.adapterPosition == 0) {
                             previousAmount = str
-                            itemAmountUpdateListener.onAmountEntered(
+                            onItemAmountUpdateListener.onAmountEntered(
                                 currencyDatumList?.get(viewHolder.adapterPosition)?.currencyCode,
                                 str
                             )
@@ -117,6 +118,15 @@ class CurrencyAdapter @Inject constructor(
         }
     }
 
+    private fun updateAdapterOnClick(applicationBinding: ListTypeCurrencyNormalBinding, position: Int) {
+        askingFocusExternally = true
+        applicationBinding.etCurrency.requestFocus()
+        Collections.swap(currencyDatumList, 0, position)
+        notifyItemMoved(position, 0)
+        onItemClickListener.onItemClick()
+        askingFocusExternally = false
+    }
+
     override fun getItemViewType(position: Int): Int {
         return if (itemCount == 0) {
             Constants.EMPTY_VIEW_TYPE
@@ -129,15 +139,6 @@ class CurrencyAdapter @Inject constructor(
         RecyclerView.ViewHolder(applicationBinding.root) {
         abstract fun bind(position: Int)
         abstract fun bind()
-    }
-
-    private fun updateAdapterOnClick(applicationBinding: ListTypeCurrencyNormalBinding, position: Int) {
-        askingFocusExternally = true
-        applicationBinding.etCurrency.requestFocus()
-        Collections.swap(currencyDatumList, 0, position)
-        notifyItemMoved(position, 0)
-        itemClickListener.onItemClick()
-        askingFocusExternally = false
     }
 
     inner class NormalViewHolder(private var applicationBinding: ListTypeCurrencyNormalBinding) :

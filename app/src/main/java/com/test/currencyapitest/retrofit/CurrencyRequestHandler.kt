@@ -1,26 +1,25 @@
-package com.test.currencyapitest.network
+package com.test.currencyapitest.retrofit
 
 import android.util.Log
+import com.test.currencyapitest.interfaces.OnResponseReceivedListener
 import com.test.currencyapitest.model.ApiResponse
 import com.test.currencyapitest.model.CurrencyDataStore
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class CurrencyRequestHandler(onResponseReceivedListener: OnResponseReceivedListener) {
+class CurrencyRequestHandler @Inject constructor(private var scheduler: Scheduler,
+                                                 private var apiService: ApiService) {
     private var disposable: Disposable? = null
     private val tag = "RequestProcessor"
-    private var onResponseReceivedListener: OnResponseReceivedListener?= onResponseReceivedListener
+    private var onResponseReceivedListener: OnResponseReceivedListener?= null
     private var isAlreadyProcessed = false
 
     fun sendCurrencyDataRequest() {
-        val retrofitClient = RetrofitClient.getRetrofitClient()
-        val apiService = retrofitClient.create(APIService::class.java)
-        val scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
         disposable =
             Observable.interval(0, 1, TimeUnit.SECONDS, scheduler)
                 .flatMapSingle { apiService.getCurrencyData("EUR") }
@@ -46,7 +45,7 @@ class CurrencyRequestHandler(onResponseReceivedListener: OnResponseReceivedListe
         disposable?.dispose()
     }
 
-    interface OnResponseReceivedListener {
-        fun onResponseReceived(response: Response<ApiResponse>)
+    fun setOnResponseReceivedListener(onResponseReceivedListener: OnResponseReceivedListener) {
+        this.onResponseReceivedListener = onResponseReceivedListener
     }
 }

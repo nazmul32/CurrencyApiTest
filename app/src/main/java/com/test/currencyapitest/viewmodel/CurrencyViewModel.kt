@@ -1,22 +1,16 @@
 package com.test.currencyapitest.viewmodel
 
-import android.app.Application
 import android.os.Build
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.test.currencyapitest.model.CurrencyDatum
 import com.test.currencyapitest.model.CurrencyDataStore
 import java.util.*
 import kotlin.collections.ArrayList
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import java.math.RoundingMode
-import javax.inject.Inject
 
 
-class CurrencyViewModel @Inject constructor() : ViewModel() {
+class CurrencyViewModel : ViewModel() {
     private val currenciesLiveData: MutableLiveData<ArrayList<CurrencyDatum>> = MutableLiveData()
     private val currenciesLiveDataUpdateRates: MutableLiveData<ArrayList<CurrencyDatum>> =
         MutableLiveData()

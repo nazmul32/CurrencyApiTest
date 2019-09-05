@@ -1,4 +1,4 @@
-package com.test.currencyapitest.network
+package com.test.currencyapitest.util
 
 class Constants private constructor() {
     companion object {

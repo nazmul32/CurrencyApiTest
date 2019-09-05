@@ -1,10 +1,8 @@
 package com.test.currencyapitest.model
 
-import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.databinding.BaseObservable
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
