@@ -18,7 +18,7 @@ import com.test.currencyapitest.interfaces.OnItemAmountUpdateListener
 import com.test.currencyapitest.interfaces.OnItemClickListener
 import com.test.currencyapitest.interfaces.OnResponseReceivedListener
 import com.test.currencyapitest.model.ApiResponse
-import com.test.currencyapitest.retrofit.CurrencyRequestHandler
+import com.test.currencyapitest.retrofit.CurrencyRateHandler
 import com.test.currencyapitest.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.fragment_currency.*
 import kotlinx.android.synthetic.main.fragment_currency.view.*
@@ -31,7 +31,7 @@ class CurrencyFragment @Inject constructor(): Fragment() {
     private lateinit var currencyAdapter: CurrencyAdapter
 
     @Inject
-    lateinit var currencyRequestHandler: CurrencyRequestHandler
+    lateinit var currencyRateHandler: CurrencyRateHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +40,7 @@ class CurrencyFragment @Inject constructor(): Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_currency, container, false)
         currencyViewModel = ViewModelProviders.of(this).get(CurrencyViewModel::class.java)
         currencyViewModel.showProgressBar()
-        currencyRequestHandler.setOnResponseReceivedListener(onResponseReceivedListener)
+        currencyRateHandler.setOnResponseReceivedListener(onResponseReceivedListener)
         initRecyclerView()
         subscribeLiveDataObservers()
         return binding.root
@@ -64,12 +64,12 @@ class CurrencyFragment @Inject constructor(): Fragment() {
 
     override fun onStart() {
         super.onStart()
-        currencyRequestHandler.sendCurrencyDataRequest()
+        currencyRateHandler.sendCurrencyDataRequest()
     }
 
     override fun onStop() {
         super.onStop()
-        currencyRequestHandler.dispose()
+        currencyRateHandler.dispose()
     }
 
     private val onResponseReceivedListener = object : OnResponseReceivedListener {

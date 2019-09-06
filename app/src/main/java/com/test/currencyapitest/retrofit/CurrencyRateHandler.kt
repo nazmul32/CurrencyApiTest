@@ -12,8 +12,8 @@ import retrofit2.Response
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class CurrencyRequestHandler @Inject constructor(private var scheduler: Scheduler,
-                                                 private var apiService: ApiService) {
+class CurrencyRateHandler @Inject constructor(private var scheduler: Scheduler,
+                                              private var apiService: ApiService) {
     private var disposable: Disposable? = null
     private val tag = "RequestProcessor"
     private var onResponseReceivedListener: OnResponseReceivedListener?= null
@@ -27,6 +27,12 @@ class CurrencyRequestHandler @Inject constructor(private var scheduler: Schedule
                 .retry()
                 .distinct()
                 .subscribe({ result -> onSuccess(result) }, { error -> onError(error) })
+    }
+
+    fun fetchCurrencyData(): Observable<Response<ApiResponse>> {
+        return Observable.just(1)
+            .flatMapSingle { apiService.getCurrencyData("EUR") }
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun onSuccess(response: Response<ApiResponse>) {
